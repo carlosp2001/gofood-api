@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "abc123def",
+    "database": "postgres",
+    "host": "165.22.8.50",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

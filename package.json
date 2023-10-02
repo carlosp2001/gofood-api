@@ -1,0 +1,32 @@
+{
+  "name": "gofood-api",
+  "version": "1.0.0",
+  "description": "API a utilizar para el desarrollo e implementación de la aplicación GoFood",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "start:prod": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carlosp2001/gofood-api.git"
+  },
+  "author": "Carlos Pineda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carlosp2001/gofood-api/issues"
+  },
+  "homepage": "https://github.com/carlosp2001/gofood-api#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.33.0",
+    "sequelize-cli": "^6.6.1",
+    "validator": "^13.11.0"
+  }
+}
