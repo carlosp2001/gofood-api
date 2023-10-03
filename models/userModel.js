@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/db');
 const validator = require('validator');
-const bcrypt = require(bcrypt);
+const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
     first_name: {
@@ -30,7 +30,7 @@ const User = sequelize.define('User', {
         },
         len: {
           args: [1, 70],
-          msg: 'El apellido es obligatorio'
+          msg: 'El apellido debe tener entre 1 y 70 caracteres'
         }
 
       }
@@ -78,6 +78,47 @@ const User = sequelize.define('User', {
     },
     passwordResetExpires: {
       type: DataTypes.DATE
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isLength: {
+          args: [5, 100],
+          msg: 'La dirección debe tener entre 5 y 100 caracteres.'
+        }
+      }
+    },
+    location: {
+      type: DataTypes.GEOMETRY('POINT'),
+      allowNull: true,
+      validate: {
+        isPoint(value) {
+          // Utiliza el paquete validator para realizar la validación
+          if (!validator.isLatLong(value, { decimal: true })) {
+            throw new Error('La ubicación debe ser un punto válido en formato latitud y longitud.');
+          }
+        }
+      }
+    },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'user',
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Debe agregarse un rol al usuario'
+        },
+        isIn: {
+          args: [['superadmin', 'admin', 'user', 'kitchen', 'driver']]
+        }
+      }
+
+    },
+    photo: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {
