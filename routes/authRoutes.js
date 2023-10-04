@@ -5,6 +5,7 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+// Rutas autenticación con Google
 router.get('/google',
   passport.authenticate('google',
     { scope: ['profile', 'email'] }));
@@ -16,12 +17,22 @@ router.get('/google/callback',
   })
 );
 
+
+// Rutas autenticación con Facebook
+router.get('/facebook',
+  passport.authenticate('facebook',
+    { scope: ['email'] }));
+
+
+router.get('/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect: `${process.env.PROJECT_URL}api/v1/auth/success`,
+    failureRedirect: `${process.env.PROJECT_URL}api/v1/auth/failure`
+  })
+);
+
 router.get('/success', authController.successAuth);
 
-router.get('/failure', (req, res) => {
-  res.status(400).json({
-    status: 'fail'
-  });
-});
+router.get('/failure', authController.failedAuth);
 
 module.exports = router;

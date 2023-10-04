@@ -4,8 +4,8 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
-    first_name: {
-      type: DataTypes.STRING(70),
+    name: {
+      type: DataTypes.STRING(100),
       allowNull: false,
       validate: {
         notNull: {
@@ -13,22 +13,15 @@ const User = sequelize.define('User', {
         },
         len: {
           args: [1, 70],
-          msg: 'El primer nombre debe tener entre 1 y 70 caracteres'
+          msg: 'El primer nombre debe tener entre 1 y 100 caracteres'
         }
 
       }
 
     },
-    last_name: {
-      type: DataTypes.STRING(70),
-      allowNull: true,
-      validate: {
-        len: {
-          args: [1, 70],
-          msg: 'El apellido debe tener entre 1 y 70 caracteres'
-        }
-
-      }
+    providerId: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING,
@@ -59,10 +52,6 @@ const User = sequelize.define('User', {
     password: {
       type: DataTypes.STRING,
       allowNull: true,
-      set(password) {
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        this.setDataValue('password', hashedPassword);
-      }
     },
     passwordChangedAt: {
       allowNull: true,
@@ -118,13 +107,24 @@ const User = sequelize.define('User', {
           msg: 'Debe agregarse un proveedor al usuario'
         },
         isIn: {
-          args: [['google', 'email']]
+          args: [['google', 'email', 'facebook']]
         }
       }
     },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Date.now()
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isValidHonduranPhoneNumber(value) {
+          if (value && !/^\+504\d{8}$/.test(value)) {
+            throw new Error('El número de teléfono debe tener el formato +50412345678.');
+          }
+        }
+      }
     }
   },
   {
@@ -138,6 +138,12 @@ User.beforeValidate((instance, options) => {
   if (instance.email) {
     instance.email = instance.email.toLowerCase();
   }
+});
+
+// Hook antes de crear un nuevo registro del Usuario
+User.beforeCreate(async (user, options) => {
+  if (user.password)
+    user.password = await bcrypt.hash(user.password, 10);
 });
 
 // Metodo para validar la contraseña, se debe utilizar en el controlador al

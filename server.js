@@ -5,7 +5,7 @@ dotenv.config({ path: './.env' });
 const User = require('./models/userModel');
 
 // Sincroniza la base de datos
-sequelize.sync({force: true}) // Si "true", eliminará todas las tablas existentes y las volverá a crear
+sequelize.sync({force: false}) // Si "true", eliminará todas las tablas existentes y las volverá a crear
   .then(() => {
     console.log('Tablas sincronizadas con éxito.');
   })

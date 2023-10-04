@@ -16,18 +16,23 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   if (existUser)
-    return next(new AppError('El correo ya existe', 401));
+    return next(new
+    AppError('El correo ya existe, inicia sesión o recupera la contraseña',
+      401));
 
 
-  // const newUser = await User.create({
-  //   name: req.body.name,
-  //   email: req.body.email,
-  //   password: req.body.password,
-  //   passwordConfirm: req.body.passwordConfirm,
-  //   role: req.body.role
-  // });
-  //
-  // createSendToken(newUser, 201, res);
+  const newUser = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
+    provider: 'email',
+    password: req.body.password,
+    role: 'user'
+  });
+
+  console.log(newUser);
+
+  createSendToken(newUser, 201, res);
 });
 
 exports.successAuth = catchAsync(async (req, res, next) => {
@@ -35,24 +40,31 @@ exports.successAuth = catchAsync(async (req, res, next) => {
     where: { email: req.user.email }
   });
 
-  if (existUser && existUser.provider !== 'google')
-    return next(new AppError('El correo ya existe', 401));
-
-  if (existUser?.provider === 'google')
-    return createSendToken(existUser, 201, res);
-
   console.log(req.user);
 
+  if (existUser &&
+    (existUser.provider !== req.user.provider
+      || existUser.providerId !== req.user.id))
+    return next(new AppError('Hay un problema con la autenticación, intenta ' +
+      'recuperar tu contraseña', 401));
+
+  if (existUser?.provider === req.user.provider)
+    return createSendToken(existUser, 201, res);
+
   const newUser = await User.create({
-    first_name: req.user.given_name,
-    last_name: req.user.family_name,
+    name: req.user.given_name,
     email: req.user.email,
     // passwordConfirm: req.body.passwordConfirm,
-    provider: 'google',
+    provider: req.user.provider,
+    providerId: req.user.id,
     role: 'user'
   });
 
   console.log(newUser);
 
   createSendToken(newUser, 201, res);
+});
+
+exports.failedAuth = catchAsync(async (req, res, next) => {
+  next(new AppError('Error al intentar autenticarse', 401));
 });

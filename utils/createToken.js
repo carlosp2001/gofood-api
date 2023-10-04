@@ -19,7 +19,8 @@ module.exports = (user, statusCode, res) => {
   res.cookie('jwt', token, cookieOption);
 
   // Remueve la contraseña del output
-  // user.password = undefined;
+  user.password = undefined;
+
 
   res.status(statusCode).json({
     status: 'success',
