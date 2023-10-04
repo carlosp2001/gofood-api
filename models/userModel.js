@@ -8,9 +8,8 @@ const User = sequelize.define('User', {
       type: DataTypes.STRING(70),
       allowNull: false,
       validate: {
-        notEmpty: {
-          args: true,
-          msg: 'El primer nombre es obligatorio'
+        notNull: {
+          msg: 'El nombre es obligatorio'
         },
         len: {
           args: [1, 70],
@@ -22,12 +21,8 @@ const User = sequelize.define('User', {
     },
     last_name: {
       type: DataTypes.STRING(70),
-      allowNull: false,
+      allowNull: true,
       validate: {
-        notEmpty: {
-          args: true,
-          msg: 'El apellido es obligatorio'
-        },
         len: {
           args: [1, 70],
           msg: 'El apellido debe tener entre 1 y 70 caracteres'
@@ -47,8 +42,7 @@ const User = sequelize.define('User', {
           args: true,
           msg: 'El correo electrónico no es válido.'
         },
-        notEmpty: {
-          args: true,
+        notNull: {
           msg: 'El campo de correo electrónico es obligatorio.'
         },
         isLowerCase: function(value) {
@@ -64,19 +58,22 @@ const User = sequelize.define('User', {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       set(password) {
         const hashedPassword = bcrypt.hashSync(password, 10);
         this.setDataValue('password', hashedPassword);
       }
     },
     passwordChangedAt: {
+      allowNull: true,
       type: DataTypes.DATE
     },
     passwordResetToken: {
+      allowNull: true,
       type: DataTypes.STRING
     },
     passwordResetExpires: {
+      allowNull: true,
       type: DataTypes.DATE
     },
     address: {
@@ -91,23 +88,15 @@ const User = sequelize.define('User', {
     },
     location: {
       type: DataTypes.GEOMETRY('POINT'),
-      allowNull: true,
-      validate: {
-        isPoint(value) {
-          // Utiliza el paquete validator para realizar la validación
-          if (!validator.isLatLong(value, { decimal: true })) {
-            throw new Error('La ubicación debe ser un punto válido en formato latitud y longitud.');
-          }
-        }
-      }
+      allowNull: true
+
     },
     role: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'user',
       validate: {
-        notEmpty: {
-          args: true,
+        notNull: {
           msg: 'Debe agregarse un rol al usuario'
         },
         isIn: {
@@ -119,6 +108,23 @@ const User = sequelize.define('User', {
     photo: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    provider: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Debe agregarse un proveedor al usuario'
+        },
+        isIn: {
+          args: [['google', 'email']]
+        }
+      }
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: Date.now()
     }
   },
   {
@@ -139,6 +145,5 @@ User.beforeValidate((instance, options) => {
 User.prototype.passwordValidation = function(password) {
   return bcrypt.compareSync(password, this.password);
 };
-
 
 module.exports = User;
