@@ -35,6 +35,39 @@ exports.signup = catchAsync(async (req, res, next) => {
   createSendToken(newUser, 201, res);
 });
 
+/**
+ * Metodo para iniciar sesion por medio del correo.
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new AppError('Por favor ingrese un correo y una contraseña',
+      400));
+  }
+
+  const user = await User.findOne({ where: { email } });
+  // console.log(user);
+
+  if (!user) {
+    return next(new AppError('Usuario no encontrado', 401));
+  }
+
+  if (!await user.passwordValidation(password) || !user.password) {
+    return next(new AppError('Contraseña incorrecta', 401));
+  }
+
+  // 3) If everything ok, send token to client
+  createSendToken(user, 200, res);
+});
+
+
+/**
+ * Metodo que verifica la autenticación cuando ha sido exitosa por medio de
+ * social,
+ * @type {(function(*, *, *): *)|*}
+ */
 exports.successAuth = catchAsync(async (req, res, next) => {
   const existUser = await User.findOne({
     where: { email: req.user.email }

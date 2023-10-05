@@ -127,11 +127,12 @@ const User = sequelize.define('User', {
       }
     }
   },
-  {
-    defaultScope: {
-      attributes: { exclude: ['password'] }
-    }
-  });
+  // {
+  //   defaultScope: {
+  //     attributes: { exclude: ['password'] }
+  //   }
+  // }
+  );
 
 // Hook para transformar el correo a minúsculas antes de la validación
 User.beforeValidate((instance, options) => {
