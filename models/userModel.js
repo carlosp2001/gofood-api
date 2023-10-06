@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/db');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const User = sequelize.define('User', {
     name: {
@@ -51,7 +52,7 @@ const User = sequelize.define('User', {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: true
     },
     passwordChangedAt: {
       allowNull: true,
@@ -126,13 +127,16 @@ const User = sequelize.define('User', {
         }
       }
     }
-  },
+  }
   // {
   //   defaultScope: {
   //     attributes: { exclude: ['password'] }
   //   }
   // }
-  );
+);
+
+////////////////////////////////////////////////////////////
+// Hooks
 
 // Hook para transformar el correo a minúsculas antes de la validación
 User.beforeValidate((instance, options) => {
@@ -147,10 +151,43 @@ User.beforeCreate(async (user, options) => {
     user.password = await bcrypt.hash(user.password, 10);
 });
 
+// Hook antes de actualizar el usuario en la base de datos
+User.beforeUpdate(async (user, options) => {
+
+  // Verifica si el campo de contraseña ha cambiado
+  if (user.changed('password')) {
+    console.log('cambiando contraseña');
+    if (user.password)
+      user.password = await bcrypt.hash(user.password, 10);
+
+  }
+});
+
+/////////////////////////////////////////////////////////////
+// Métodos para el modelo
 // Metodo para validar la contraseña, se debe utilizar en el controlador al
 // al momemento de validación
 User.prototype.passwordValidation = function(password) {
   return bcrypt.compareSync(password, this.password);
+};
+
+User.prototype.createPasswordResetToken = function() {
+  const resetCode = Math.random()
+    .toString(36)
+    .substr(2, 4)
+    .toUpperCase();
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetCode)
+    .digest('hex');
+
+  console.log(resetCode, this.passwordResetToken);
+
+  const now = new Date();
+  this.passwordResetExpires = new Date(now.getTime() + 10 * 60 * 1000);
+
+  return resetCode;
 };
 
 module.exports = User;

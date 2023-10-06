@@ -1,8 +1,9 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-
-const createSendToken = require('../utils/createToken');
+const sendEmail = require('../utils/email');
+const {createSendToken, verifyToken} = require('../utils/createToken');
+const crypto = require('crypto');
 
 /**
  * Método para crear un usuario con el rol de usuario, metodo para registrarse
@@ -73,7 +74,7 @@ exports.successAuth = catchAsync(async (req, res, next) => {
     where: { email: req.user.email }
   });
 
-  console.log(req.user);
+  // console.log(req.user);
 
   if (existUser &&
     (existUser.provider !== req.user.provider
@@ -93,11 +94,95 @@ exports.successAuth = catchAsync(async (req, res, next) => {
     role: 'user'
   });
 
-  console.log(newUser);
+  // console.log(newUser);
 
   createSendToken(newUser, 201, res);
 });
 
+/**
+ * Metodo que recibe una autenticación fallida por parte del social
+ * @type {(function(*, *, *): *)|*}
+ */
 exports.failedAuth = catchAsync(async (req, res, next) => {
   next(new AppError('Error al intentar autenticarse', 401));
+});
+
+/**
+ * Metodo para solicitar el token para restaurar la contraseña
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Conseguir el usuario obtenido de la POST Request
+  const user = await User.findOne({
+    where: { email: req.body.email }
+  });
+
+  if (!user) {
+    return next(new AppError('Usuario no encontrado.', 404));
+  }
+
+  // 2) Generar el token para almacenar para restaurar contraseña
+  const resetToken = user.createPasswordResetToken();
+  console.log(resetToken);
+  await user.save();
+
+  // 3) Enviarlo al correo del usuario
+  // const resetURL = `${req.protocol}://${req.get(
+  //   'host'
+  // )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Este el código de recuperación ${resetToken}`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Tu código para restaurar tu contraseña (válido por 10 minutos)',
+      message
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token enviado con exito!'
+    });
+  } catch (err) {
+    user.passwordResetToken = null;
+    user.passwordResetExpires = null;
+    await user.save();
+    console.log('error');
+    return next(
+      new AppError('Hubo un error enviando el token. Intenta de nuevo mas tarde!'),
+      500
+    );
+  }
+});
+
+/**
+ * Metodo para verificar si el token es válido
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.verifyTokenPassword = catchAsync(async (req, res, next) => {
+  if (!await verifyToken(req.body.token, next)) return
+  res.status(200).json({
+    status: 'success',
+    message: `Token válido`
+  });
+});
+
+/**
+ * Metodo para verificar el token y actualizar la contraseña al mismo tiempo
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const {user} = await verifyToken(req.body.token, next);
+  // return console.log(user);
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = null;
+  user.passwordResetExpires = null;
+  await user.save();
+  console.log(user);
+
+  // 3) Update changedPasswordAt property for the user
+  // 4) Log the user in, send JWT
+  createSendToken(user, 200, res);
 });
