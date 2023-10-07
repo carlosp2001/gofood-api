@@ -157,8 +157,11 @@ User.beforeUpdate(async (user, options) => {
   // Verifica si el campo de contraseña ha cambiado
   if (user.changed('password')) {
     console.log('cambiando contraseña');
-    if (user.password)
+    if (user.password) {
       user.password = await bcrypt.hash(user.password, 10);
+      user.passwordChangedAt = Date.now();
+
+    }
 
   }
 });

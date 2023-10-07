@@ -50,7 +50,7 @@ exports.verifyToken = async (token, next) => {
         },
         {
           passwordResetExpires: {
-            [Sequelize.Op.lt]: new Date('2023-10-06 05:41:50.690000 +00:00')
+            [Sequelize.Op.gt]: new Date('2023-10-06 05:41:50.690000 +00:00')
           }
         }
       ]

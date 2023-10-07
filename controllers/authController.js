@@ -2,8 +2,9 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
-const {createSendToken, verifyToken} = require('../utils/createToken');
+const { createSendToken, verifyToken } = require('../utils/createToken');
 const crypto = require('crypto');
+
 
 /**
  * Método para crear un usuario con el rol de usuario, metodo para registrarse
@@ -55,7 +56,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Usuario no encontrado', 401));
   }
 
-  if (!await user.passwordValidation(password) || !user.password) {
+  if (!user.password || !await user.passwordValidation(password)) {
     return next(new AppError('Contraseña incorrecta', 401));
   }
 
@@ -79,8 +80,7 @@ exports.successAuth = catchAsync(async (req, res, next) => {
   if (existUser &&
     (existUser.provider !== req.user.provider
       || existUser.providerId !== req.user.id))
-    return next(new AppError('Hay un problema con la autenticación, intenta ' +
-      'recuperar tu contraseña', 401));
+    return next(new AppError('Hay un problema con la autenticación, inicia sesión con tu contraseña o restaura la contraseña', 401));
 
   if (existUser?.provider === req.user.provider)
     return createSendToken(existUser, 201, res);
@@ -98,6 +98,17 @@ exports.successAuth = catchAsync(async (req, res, next) => {
 
   createSendToken(newUser, 201, res);
 });
+
+
+/**
+ * Metodo para verificar que la autenticacion se haya realizado bien con Auth0
+ * y Apple
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.successAuthApple = catchAsync(async (req, res, next) => {
+  res.redirect(auth0.buildAuthorizeUrl());
+});
+
 
 /**
  * Metodo que recibe una autenticación fallida por parte del social
@@ -161,7 +172,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
  * @type {(function(*, *, *): *)|*}
  */
 exports.verifyTokenPassword = catchAsync(async (req, res, next) => {
-  if (!await verifyToken(req.body.token, next)) return
+  if (!await verifyToken(req.body.token, next)) return;
   res.status(200).json({
     status: 'success',
     message: `Token válido`
@@ -173,16 +184,22 @@ exports.verifyTokenPassword = catchAsync(async (req, res, next) => {
  * @type {(function(*, *, *): *)|*}
  */
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  const {user} = await verifyToken(req.body.token, next);
-  // return console.log(user);
+  const { user } = await verifyToken(req.body.token, next);
+  if (!req.body.password || !req.body.passwordConfirm) return next(new
+  AppError('Ingrese los datos de la contraseña valido'));
+
+  if (req.body.password !== req.body.passwordConfirm) return next(new
+  AppError('Las contraseñas no son iguales', 400));
+
   user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = null;
   user.passwordResetExpires = null;
-  await user.save();
+
   console.log(user);
 
-  // 3) Update changedPasswordAt property for the user
+  // La actualización de la fecha en la que el usuario cambia la contraseña
+  await user.save();
+
   // 4) Log the user in, send JWT
   createSendToken(user, 200, res);
 });
