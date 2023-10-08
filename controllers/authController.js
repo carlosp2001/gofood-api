@@ -185,6 +185,9 @@ exports.verifyTokenPassword = catchAsync(async (req, res, next) => {
  */
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { user } = await verifyToken(req.body.token, next);
+
+  if (!user) return;
+
   if (!req.body.password || !req.body.passwordConfirm) return next(new
   AppError('Ingrese los datos de la contraseña valido'));
 
@@ -195,11 +198,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken = null;
   user.passwordResetExpires = null;
 
-  console.log(user);
+  // console.log(user);
 
   // La actualización de la fecha en la que el usuario cambia la contraseña
   await user.save();
 
-  // 4) Log the user in, send JWT
   createSendToken(user, 200, res);
 });
