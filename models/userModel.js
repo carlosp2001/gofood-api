@@ -126,13 +126,22 @@ const User = sequelize.define('User', {
           }
         }
       }
+    },
+    refreshToken: {
+      type:DataTypes.STRING,
+      allowNull: true
     }
-  }
+  },
   // {
   //   defaultScope: {
   //     attributes: { exclude: ['password'] }
   //   }
   // }
+  {
+    defaultScope: {
+      attributes: { exclude: ['refreshToken'] }
+    }
+  }
 );
 
 ////////////////////////////////////////////////////////////
