@@ -1,6 +1,12 @@
 const dotenv = require('dotenv');
 const sequelize = require('./utils/db');
-dotenv.config({ path: './.env' });
+
+if (process.env.NODE_ENV === 'dev')
+  dotenv.config({ path: './.env' });
+else if (process.env.NODE_ENV === 'local')
+  dotenv.config({ path: './.env.local' });
+
+console.log(process.env);
 
 const User = require('./models/userModel');
 

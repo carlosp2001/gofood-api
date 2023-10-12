@@ -17,7 +17,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // 1) Middlewares
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'dev') {
   app.use(morgan('dev'));
 }
 app.use(express.json());

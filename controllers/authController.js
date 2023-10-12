@@ -3,8 +3,6 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const { createSendToken, verifyToken } = require('../utils/createToken');
-const crypto = require('crypto');
-
 
 /**
  * Método para crear un usuario con el rol de usuario, metodo para registrarse
@@ -43,6 +41,7 @@ exports.signup = catchAsync(async (req, res, next) => {
  */
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
+  console.log(email);
 
   if (!email || !password) {
     return next(new AppError('Por favor ingrese un correo y una contraseña',

@@ -4,7 +4,8 @@
   "description": "API a utilizar para el desarrollo e implementación de la aplicación GoFood",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "NODE_ENV=local nodemon server.js",
+    "start:dev": "NODE_ENV=dev pm2 server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js"
   },
@@ -34,6 +35,7 @@
     "passport-google-oauth2": "~0.2.0",
     "pg": "~8.11.3",
     "pg-hstore": "~2.3.4",
+    "pm2": "^5.3.0",
     "sequelize": "~6.33.0",
     "sequelize-cli": "~6.6.1",
     "validator": "~13.11.0"

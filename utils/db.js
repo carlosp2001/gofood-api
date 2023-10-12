@@ -1,6 +1,11 @@
 const Sequelize = require('sequelize');
 const dotenv = require('dotenv');
-dotenv.config({ path: './.env' });
+
+if (process.env.NODE_ENV === 'dev')
+  dotenv.config({ path: './.env' });
+else if (process.env.NODE_ENV === 'local')
+  dotenv.config({ path: './.env.local' });
+
 const sequelize = new Sequelize(process.env.DATABASE, { dialect: 'postgres'});
 
 sequelize
