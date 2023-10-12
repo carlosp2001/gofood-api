@@ -10,7 +10,7 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 
-exports.createSendToken = (user, statusCode, res) => {
+exports.createSendToken = catchAsync( async (user, statusCode, res) => {
   const token = signToken(user.id);
 
   const cookieOption = {
@@ -23,9 +23,14 @@ exports.createSendToken = (user, statusCode, res) => {
   if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
   res.cookie('jwt', token, cookieOption);
 
+
+  console.log(token);
+  user.refreshToken = token;
+  await user.save();
+
   // Remueve la contraseña del output
   user.password = undefined;
-
+  user.refreshToken = undefined;
 
   res.status(statusCode).json({
     status: 'success',
@@ -34,7 +39,7 @@ exports.createSendToken = (user, statusCode, res) => {
       user
     }
   });
-};
+});
 
 exports.verifyToken = async (token, next) => {
   const hashedToken = crypto
