@@ -1,8 +1,13 @@
+const { promisify } = require('util');
+
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const { createSendToken, verifyToken } = require('../utils/createToken');
+
 
 /**
  * Método para crear un usuario con el rol de usuario, metodo para registrarse
@@ -203,4 +208,58 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   createSendToken(user, 200, res);
+});
+
+/**
+ * Middleware para verificar la autenticación del usuario y agregar la
+ * información a la request
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Obteniendo el token en caso de existir
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(
+      new AppError(
+        'No has iniciado sesión! Por favor inicia sesión',
+        401
+      )
+    );
+  }
+  // 2) Verificación del token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+  // 3) Revisar si el usuario aun existe
+
+  const currentUser = await User.findByPk(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        'El usuario perteneciente a este token no existe'
+      )
+    );
+  }
+
+  // 4) Revisar si el usuario ha cambiado la contraseña después de haber emitido
+  // el token
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError(
+        'Usuario recientemente cambió la contraseña! ' +
+        'Por favor ingresa de nuevo',
+        401
+      )
+    );
+  }
+
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
+  next();
 });

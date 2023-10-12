@@ -193,4 +193,14 @@ User.prototype.createPasswordResetToken = function() {
   return resetCode;
 };
 
+User.prototype.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = Math.floor(this.passwordChangedAt.getTime() / 1000);
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means NOT changed
+  return false;
+};
+
 module.exports = User;
