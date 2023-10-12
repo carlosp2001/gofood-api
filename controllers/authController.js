@@ -259,7 +259,51 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // GRANT ACCESS TO PROTECTED ROUTE
+  // Dar acceso a la ruta protegida
   req.user = currentUser;
   next();
 });
+
+
+/**
+ * Método para conseguir un refresh token
+ * @type {(function(*, *, *): *)|*}
+ */
+exports.refreshToken = catchAsync(async (req, res, next) => {
+  // 1) Se obtiene el token por medio de la solicitud,
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+
+  try {
+    // 2) Se verifica que el token este vencido para extender uno nuevo
+    await jwt.verify(token, process.env.JWT_SECRET);
+
+    // 3) De no haber expirado el token se manda una respuesta
+    res.status(200).json({
+      status: 'success',
+      message: 'El token aun no expira'
+    })
+  } catch (e) {
+    // 4) Si el token ha expirado se verifica el error y se manda uno nuevo
+    if (e.name === 'TokenExpiredError') {
+      const currentUser = await User.findOne({
+        where:
+          {
+            refreshToken: token
+          }
+      });
+
+      if (currentUser) createSendToken(currentUser, 201, res);
+      else return next(new AppError('El refresh token es invalido por favor ' +
+        'inicia sesión nuevamente'));
+    }
+
+  }
+});
+

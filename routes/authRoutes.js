@@ -5,6 +5,10 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Auth Social
+
 // Rutas autenticación con Google
 router.get('/google',
   passport.authenticate('google',
@@ -16,7 +20,6 @@ router.get('/google/callback',
     failureRedirect: `${process.env.PROJECT_URL}api/v1/auth/failure`
   })
 );
-
 
 // Rutas autenticación con Facebook
 router.get('/facebook',
@@ -57,7 +60,8 @@ router.get('/facebook/callback',
 //       console.log('fallido');
 //     }
 //   } catch (error) {
-//     // Maneja cualquier error que pueda ocurrir durante el proceso de inicio de sesión
+//     // Maneja cualquier error que pueda ocurrir durante el proceso de inicio
+//     // de sesión
 //     console.error(error);
 //   }
 // })
@@ -72,5 +76,11 @@ router.get('/facebook/callback',
 router.get('/success', authController.successAuth);
 
 router.get('/failure', authController.failedAuth);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Rutas autenticación token
+
+router.get('/refresh-token', authController.refreshToken);
 
 module.exports = router;
