@@ -17,4 +17,8 @@ sequelize
     console.error('Error al conectar a la base de datos:', err);
   });
 
+setInterval(() => {
+  sequelize.query('SELECT 1');
+}, 60000);
+
 module.exports = sequelize;

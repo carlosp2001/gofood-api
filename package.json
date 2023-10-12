@@ -4,9 +4,9 @@
   "description": "API a utilizar para el desarrollo e implementación de la aplicación GoFood",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=local nodemon server.js",
-    "start:dev": "NODE_ENV=dev pm2 start server.js",
-    "start:prod": "NODE_ENV=production pm2 start server.js",
+    "start": "NODE_ENV=local pm2 start server.js --watch server.js --interpreter node_modules/.bin/nodemon",
+    "start:dev": "NODE_ENV=dev pm2 start server.js --watch server.js --interpreter node_modules/.bin/nodemon",
+    "start:prod": "NODE_ENV=production pm2 start server.js --watch server.js --interpreter node_modules/.bin/nodemon",
     "debug": "ndb server.js"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "jsonwebtoken": "~9.0.2",
     "morgan": "~1.10.0",
     "nodemailer": "~6.9.5",
+    "nodemon": "^3.0.1",
     "passport": "~0.6.0",
     "passport-apple": "~2.0.2",
     "passport-facebook": "~3.0.0",
