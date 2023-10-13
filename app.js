@@ -7,6 +7,8 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
+const fileRouter = require('./routes/fileRoutes');
+
 
 const app = express();
 require('./utils/passport');
@@ -25,6 +27,8 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/file', fileRouter);
+
 
 app.get('/', (req, res) => {
   res.status(200).send('hello');
