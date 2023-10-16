@@ -6,7 +6,13 @@ if (process.env.NODE_ENV === 'dev')
 else if (process.env.NODE_ENV === 'local')
   dotenv.config({ path: './.env.local' });
 
-const sequelize = new Sequelize(process.env.DATABASE, { dialect: 'postgres'});
+const sequelize = new Sequelize(process.env.DATABASE, {
+  dialect: 'postgres',
+  pool: {
+    max: 20,
+    min: 0
+  }
+});
 
 sequelize
   .authenticate()
@@ -17,8 +23,10 @@ sequelize
     console.error('Error al conectar a la base de datos:', err);
   });
 
-setInterval(() => {
-  sequelize.query('SELECT 1');
-}, 60000);
+// setInterval(() => {
+//   sequelize.query('SELECT 1');
+//   sequelize.close();
+// }, 6000);
+
 
 module.exports = sequelize;
