@@ -25,6 +25,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     AppError('El correo ya existe, inicia sesión o recupera la contraseña',
       401));
 
+  if (!req.body.password)
+    return next(new AppError('Necesitas ingresar una contraseña válida'));
 
   const newUser = await User.create({
     name: req.body.name,
