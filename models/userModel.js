@@ -76,11 +76,11 @@ const User = sequelize.define('User', {
         }
       }
     },
-    location: {
-      type: DataTypes.GEOMETRY('POINT'),
-      allowNull: true
-
-    },
+    // location: {
+    //   type: DataTypes.GEOMETRY('POINT'),
+    //   allowNull: true
+    //
+    // },
     role: {
       type: DataTypes.STRING,
       allowNull: false,
