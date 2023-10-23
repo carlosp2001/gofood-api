@@ -3,14 +3,14 @@ const AppError = require('../utils/appError');
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
-    const results = await Model.findAll();
+    const data = await Model.findAll();
 
     // SEND RESPONSE
     res.status(200).json({
       status: 'success',
       // requestedAt: req.requestTime,
-      results: results.length,
-      data: { results },
+      results: data.length,
+      data,
     });
     // console.log(err);
   });

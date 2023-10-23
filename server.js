@@ -12,7 +12,7 @@ const User = require('./models/userModel');
 const Restaurant = require('./models/restaurantModel');
 
 // Sincroniza la base de datos
-sequelize.sync({ force: true }) // Si "true", eliminará todas las tablas existentes y las volverá a crear
+sequelize.sync() // Si "true", eliminará todas las tablas existentes y las volverá a crear
   .then(() => {
     console.log('Tablas sincronizadas con éxito.');
   })

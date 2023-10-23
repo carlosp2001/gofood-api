@@ -1,4 +1,5 @@
 const { DataTypes, UUID, UUIDV4 } = require('sequelize');
+const slugify = require('slugify');
 const sequelize = require('../utils/db');
 const validator = require('validator');
 
@@ -37,11 +38,23 @@ const Sucursal = sequelize.define('Sucursal', {
       type: DataTypes.STRING,
       allowNull: false
     },
-  // location: {
-  //   type: DataTypes.GEOMETRY('POINT'),
-  //   allowNull: true
-  //
-  // },
+    slug: {
+      type: DataTypes.STRING,
+      validator: {
+        notNull: {
+          msg: 'El slug debe existir'
+        }
+      },
+      unique: {
+        args: true,
+        msg: 'El nombre debe ser único'
+      }
+    },
+    // location: {
+    //   type: DataTypes.GEOMETRY('POINT'),
+    //   allowNull: true
+    //
+    // },
     images: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
@@ -58,7 +71,7 @@ const Sucursal = sequelize.define('Sucursal', {
       allowNull: false,
       notNull: {
         msg: 'Es obligatorio agregar un restaurante'
-      },
+      }
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -66,5 +79,20 @@ const Sucursal = sequelize.define('Sucursal', {
     }
   }
 );
+
+// Hook para agregar el slug antes de crear
+Sucursal.beforeCreate(async (sucursal, options) => {
+  addSlug(sucursal);
+});
+
+// Hook para agregar el slug antes de editar
+Sucursal.beforeUpdate(async (sucursal, options) => {
+  addSlug(sucursal);
+});
+
+const addSlug = (sucursal) => {
+  if (sucursal.name)
+    sucursal.slug = slugify(sucursal.name, { lower: true });
+};
 
 module.exports = Sucursal;
