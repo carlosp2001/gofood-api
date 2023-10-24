@@ -8,7 +8,22 @@ const AppError = require('../utils/appError');
 
 exports.getAllSucursals = factory.getAll(Sucursal);
 
-exports.deleteSucursal = factory.deleteOne(Sucursal);
+exports.deleteSucursal = catchAsync(async (req, res, next) => {
+  const existingSucursal = await Sucursal.findByPk(req.params.id);
+
+  if (!existingSucursal)
+    return next(new AppError('Ningún Registro encontrado', 404));
+
+  const currentImages = _.cloneDeep(existingSucursal.images);
+
+  await existingSucursal.destroy();
+  console.log(await fileController.deleteFiles(currentImages));
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
 
 exports.createSucursal = catchAsync(async (req, res, next) => {
   let images;
