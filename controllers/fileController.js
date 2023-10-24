@@ -1,13 +1,8 @@
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 const AppError = require('../utils/appError');
 const aws = require('../utils/aws');
-
-const generateUniqueName = function (originalName, userId) {
-  const extension = path.extname(originalName);
-  const timestamp = Date.now();
-  return `${userId}_${timestamp}${extension}`;
-};
 
 exports.uploadFiles = async (files, res, next, validationTypes) => {
   if (files.length === 0 || !files)
@@ -21,7 +16,10 @@ exports.uploadFiles = async (files, res, next, validationTypes) => {
   return await Promise.all(
     files.map((f, index) =>
       aws
-        .uploadFile(`sucursal/${uuidv4()}-${index}`, f.buffer)
+        .uploadFile(
+          `sucursal/${uuidv4()}-${index}${path.extname(f.originalname)}`,
+          f.buffer
+        )
         .then((data) => ({
           location: data.Location,
           key: data.Key,

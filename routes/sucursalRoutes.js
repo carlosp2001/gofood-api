@@ -14,7 +14,7 @@ router.post(
 router.get('/:id', sucursalController.getOneSucursal);
 router.patch(
   '/:id',
-  multer.upload.array('image', 5),
+  multer.upload.array('files', 3),
   sucursalController.updateSucursal
 );
 router.delete('/:id', sucursalController.deleteSucursal);

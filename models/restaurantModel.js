@@ -2,8 +2,6 @@ const { DataTypes, UUID, UUIDV4 } = require('sequelize');
 const sequelize = require('../utils/db');
 const validator = require('validator');
 
-const Sucursal = require('./sucursalModel');
-
 const Restaurant = sequelize.define('Restaurant', {
     id: {
       type: UUID,
@@ -20,7 +18,11 @@ const Restaurant = sequelize.define('Restaurant', {
         len: {
           args: [1, 70],
           msg: 'El nombre del restaurante debe tener entre 1 y 100 caracteres'
-        }
+        },
+        notEmpty: {
+          args: true,
+          msg: 'El nombre del restaurante es obligatorio'
+        },
       }
     },
     phoneNumber: {
@@ -40,13 +42,5 @@ const Restaurant = sequelize.define('Restaurant', {
     }
   }
 );
-
-Restaurant.hasMany(Sucursal, {
-  foreignKey: 'restaurantId'
-});
-
-Sucursal.belongsTo(Restaurant, {
-  foreignKey: 'restaurantId'
-});
 
 module.exports = Restaurant;

@@ -3,8 +3,7 @@ const sequelize = require('./utils/db');
 
 console.log(process.env.NODE_ENV);
 
-if (process.env.NODE_ENV === 'dev')
-  dotenv.config({ path: './.env' });
+if (process.env.NODE_ENV === 'dev') dotenv.config({ path: './.env' });
 else if (process.env.NODE_ENV === 'local')
   dotenv.config({ path: './.env.local' });
 
@@ -12,7 +11,8 @@ const User = require('./models/userModel');
 const Restaurant = require('./models/restaurantModel');
 
 // Sincroniza la base de datos
-sequelize.sync() // Si "true", eliminará todas las tablas existentes y las volverá a crear
+sequelize
+  .sync({ force: false }) // Si "true", eliminará todas las tablas existentes y las volverá a crear
   .then(() => {
     console.log('Tablas sincronizadas con éxito.');
   })

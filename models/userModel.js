@@ -15,7 +15,11 @@ const User = sequelize.define('User', {
         len: {
           args: [1, 70],
           msg: 'El primer nombre debe tener entre 1 y 100 caracteres'
-        }
+        },
+        notEmpty: {
+          args: true,
+          msg: 'El primer nombre debe tener entre 1 y 100 caracteres'
+        },
 
       }
 
