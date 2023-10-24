@@ -26,36 +26,11 @@ exports.deleteSucursal = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createSucursal = catchAsync(async (req, res, next) => {
-  let images;
-  try {
-    // Primer se crea un array con las extensiones permitidas para los archivos
-    const validationTypes = ['image/png', 'image/jpg', 'image/jpeg'];
-
-    // Se llama ala funcion uploadFiles
-    images = await fileController.uploadFiles(
-      req.files,
-      res,
-      next,
-      validationTypes
-    );
-    req.body.images = images;
-    const result = await Sucursal.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      data: {
-        data: result,
-      },
-    });
-  } catch (e) {
-    const results = await fileController.deleteFiles(images);
-    console.log(results);
-    res.status(400).json({
-      status: 'fail',
-      error: e,
-    });
-  }
-});
+exports.createSucursal = factory.createOneWithFiles(Sucursal, [
+  'image/png',
+  'image/jpg',
+  'image/jpeg',
+], 'images');
 
 exports.updateSucursal = catchAsync(async (req, res, next) => {
   // 1) Encontrar el registro a actualizar

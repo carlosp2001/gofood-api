@@ -2,6 +2,7 @@ const uuidValidate = require('uuid-validate');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Sucursal = require('../models/sucursalModel');
+const fileController = require('../controllers/fileController');
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -24,14 +25,12 @@ exports.getOne = (Model) =>
 
     const result = await Model.findByPk(req.params.id);
 
-    if (!result)
-      return next(new AppError('Registro no encontrado', 404));
+    if (!result) return next(new AppError('Registro no encontrado', 404));
 
     res.status(200).json({
       status: 'success',
-      data: { data: result },
+      data: result,
     });
-
   });
 
 exports.createOne = (Model) =>
@@ -56,7 +55,6 @@ exports.updateOne = (Model) =>
 
     const updatedRecord = await existingRecord.update(req.body);
 
-
     res.status(200).json({
       status: 'success',
       data: {
@@ -79,4 +77,33 @@ exports.deleteOne = (Model) =>
       status: 'success',
       data: null,
     });
+  });
+
+exports.createOneWithFiles = (Model, validationTypes, fileColumn) =>
+  catchAsync(async (req, res, next) => {
+    let files;
+
+    try {
+      files = await fileController.uploadFiles(
+        req.files,
+        res,
+        next,
+        validationTypes
+      );
+      req.body[fileColumn] = files;
+      const result = await Model.create(req.body);
+      res.status(201).json({
+        status: 'success',
+        data: {
+          data: result,
+        },
+      });
+    } catch (e) {
+      const results = await fileController.deleteFiles(files);
+      console.log(results);
+      res.status(400).json({
+        status: 'fail',
+        error: e,
+      });
+    }
   });
