@@ -1,5 +1,7 @@
+const uuidValidate = require('uuid-validate');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const Sucursal = require('../models/sucursalModel');
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -13,6 +15,23 @@ exports.getAll = (Model) =>
       data,
     });
     // console.log(err);
+  });
+
+exports.getOne = (Model) =>
+  catchAsync(async (req, res, next) => {
+    if (!uuidValidate(req.params.id))
+      return next(new AppError('El id del registro no es válido', 404));
+
+    const result = await Model.findByPk(req.params.id);
+
+    if (!result)
+      return next(new AppError('Registro no encontrado', 404));
+
+    res.status(200).json({
+      status: 'success',
+      data: { data: result },
+    });
+
   });
 
 exports.createOne = (Model) =>

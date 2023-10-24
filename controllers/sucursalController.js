@@ -7,6 +7,7 @@ const fileController = require('../controllers/fileController');
 const AppError = require('../utils/appError');
 
 exports.getAllSucursals = factory.getAll(Sucursal);
+exports.getOneSucursal = factory.getOne(Sucursal);
 
 exports.deleteSucursal = catchAsync(async (req, res, next) => {
   const existingSucursal = await Sucursal.findByPk(req.params.id);
