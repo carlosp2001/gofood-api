@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION
+  region: process.env.AWS_REGION,
 });
 
 const aws = new AWS.S3();
@@ -16,31 +16,21 @@ const aws = new AWS.S3();
  * @param route
  * @returns {Promise<unknown>}
  */
-exports.uploadFile = function(fileName, fileContent, route) {
-  return new Promise((resolve, reject) => {
-    const params = {
-      Bucket: 'gofoodstorage',
-      Key: fileName,
-      Body: fileContent
-    };
+exports.uploadFile = async function (fileName, fileContent) {
+  const params = {
+    Bucket: 'gofoodstorage',
+    Key: fileName,
+    Body: fileContent,
+  };
 
-    aws.upload(params, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        // Borra el archivo temporal en el servidor
-        // fs.unlinkSync(myPath + '/image.');
-        resolve(data);
-      }
-    });
-  });
+  return aws.upload(params).promise();
 };
 
-exports.readFile = function(fileKey) {
+exports.readFile = function (fileKey) {
   return new Promise((resolve, reject) => {
     const params = {
       Bucket: 'gofoodstorage',
-      Key: fileKey
+      Key: fileKey,
     };
     aws.getObject(params, (err, data) => {
       if (err) reject(err);
@@ -49,15 +39,10 @@ exports.readFile = function(fileKey) {
   });
 };
 
-exports.deleteFile = function(fileKey) {
-  return new Promise((resolve, reject) => {
-    const params = {
-      Bucket: 'gofoodstorage',
-      Key: fileKey
-    };
-    aws.deleteObject(params, (err, data) => {
-      if (err) reject(err);
-      resolve(data);
-    });
-  })
-}
+exports.deleteFile = function (fileKey) {
+  const params = {
+    Bucket: 'gofoodstorage',
+    Key: fileKey,
+  };
+  return aws.deleteObject(params).promise();
+};

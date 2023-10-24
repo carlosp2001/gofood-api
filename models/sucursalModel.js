@@ -36,7 +36,12 @@ const Sucursal = sequelize.define('Sucursal', {
     },
     address: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'La sucursal debe contar con una dirección'
+        },
+      }
     },
     slug: {
       type: DataTypes.STRING,

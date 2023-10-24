@@ -1,22 +1,84 @@
+const _ = require('lodash');
+
 const factory = require('./handlerFactory');
 const Sucursal = require('../models/sucursalModel');
-
 const catchAsync = require('../utils/catchAsync');
+const fileController = require('../controllers/fileController');
+const AppError = require('../utils/appError');
 
 exports.getAllSucursals = factory.getAll(Sucursal);
 
-exports.updateSucursal = factory.updateOne(Sucursal);
 exports.deleteSucursal = factory.deleteOne(Sucursal);
 
-exports.createSucursal = catchAsync(async (req, res) => {
-  console.log(req.body);
+exports.createSucursal = catchAsync(async (req, res, next) => {
+  let images;
+  try {
+    // Primer se crea un array con las extensiones permitidas para los archivos
+    const validationTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
-  const result = await Sucursal.create(req.body);
+    // Se llama ala funcion uploadFiles
+    images = await fileController.uploadFiles(
+      req.files,
+      res,
+      next,
+      validationTypes
+    );
+    req.body.images = images;
+    const result = await Sucursal.create(req.body);
+    res.status(201).json({
+      status: 'success',
+      data: {
+        data: result,
+      },
+    });
+  } catch (e) {
+    const results = await fileController.deleteFiles(images);
+    console.log(results);
+    res.status(400).json({
+      status: 'fail',
+      error: e,
+    });
+  }
+});
 
-  res.status(201).json({
+exports.updateSucursal = catchAsync(async (req, res, next) => {
+  // 1) Encontrar el registro a actualizar
+  const existingSucursal = await Sucursal.findByPk(req.params.id);
+
+  if (!existingSucursal)
+    return next(new AppError('Ningún Registro encontrado', 404));
+
+  let currentImages;
+  let images;
+
+  if (req.files.length > 0 && req.files) {
+    console.log('true');
+    // 2) Guardar las imagenes actuales del registro
+    currentImages = _.cloneDeep(existingSucursal.images);
+
+    const validationTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+
+    // 3) Subir las nuevas imagenes
+    images = await fileController.uploadFiles(
+      req.files,
+      res,
+      next,
+      validationTypes
+    );
+
+    req.body.images = images;
+  }
+
+  // 4) Se guarda en el nuevo registro
+  const updatedRecord = await existingSucursal.update(req.body);
+
+  if (req.files.length > 0 && req.files)
+    console.log(await fileController.deleteFiles(currentImages));
+
+  res.status(200).json({
     status: 'success',
     data: {
-      data: result,
+      data: updatedRecord,
     },
   });
-})
+});
