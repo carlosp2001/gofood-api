@@ -1,13 +1,14 @@
 const express = require('express');
 
-const Restaurant = require('../models/restaurantModel');
+const multer = require('../utils/multer');
 const restaurantController = require('../controllers/restaurantController');
 
 const router = express.Router();
 
 router.get('/', restaurantController.getAllRestaurants);
-router.post('/', restaurantController.createRestaurant);
-router.patch('/:id', restaurantController.updateRestaurant);
+router.post('/', multer.upload.array('files', 1), restaurantController.createRestaurant);
+router.get('/:id', restaurantController.getOneRestaurant);
+router.patch('/:id', multer.upload.array('files', 1), restaurantController.updateRestaurant);
 router.delete('/:id', restaurantController.deleteRestaurant);
 
 

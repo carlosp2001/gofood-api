@@ -93,7 +93,7 @@ exports.createOneWithFiles = (Model, validationTypes, fileColumn) =>
 
     // 4) Se comienzan a subir los archivos
     try {
-      if (req.files.length > 0 && req.files) {
+      if (req.files?.length > 0 && req.files) {
         files = await fileController.uploadFiles(
           req.files,
           res,
@@ -116,7 +116,7 @@ exports.createOneWithFiles = (Model, validationTypes, fileColumn) =>
       });
     } catch (e) {
       // 7) De haber algún error se borrará los archivos que fueron subidos
-      if (req.files.length > 0 && req.files && files) {
+      if (req.files?.length > 0 && req.files && files) {
         console.log(await fileController.deleteFiles(files));
       }
 
@@ -152,7 +152,7 @@ exports.updateOneWithFiles = (Model, validationTypes, fileColumn) =>
     await existingRecord.validate();
 
     // 7) De ser los campos válidos comienzan los archivos a subirse
-    if (req.files.length > 0 && req.files) {
+    if (req.files?.length > 0 && req.files) {
       // 8) Guardar las imágenes actuales del registro
       currentFiles = _.cloneDeep(existingRecord[fileColumn]);
 
