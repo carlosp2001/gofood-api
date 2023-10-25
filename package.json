@@ -7,7 +7,8 @@
     "start": "NODE_ENV=local pm2 start server.js --watch server.js --interpreter node_modules/.bin/nodemon",
     "start:dev": "NODE_ENV=dev pm2 start server.js --watch server.js --interpreter node_modules/.bin/nodemon",
     "start:prod": "NODE_ENV=production pm2 start server.js --watch server.js --interpreter node_modules/.bin/nodemon",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "start:render": "NODE_ENV node server.js"
   },
   "repository": {
     "type": "git",
