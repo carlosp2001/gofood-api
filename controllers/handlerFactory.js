@@ -1,9 +1,9 @@
 const uuidValidate = require('uuid-validate');
+const sequelize = require('../utils/db');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const fileController = require('../controllers/fileController');
 const _ = require('lodash');
-const Sucursal = require('../models/sucursalModel');
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -35,6 +35,19 @@ exports.getOne = (Model) =>
       data: result,
     });
   });
+
+exports.getOneWithQuery = catchAsync(async (res, next, query) => {
+  const result = await sequelize.query(query, {
+    type: sequelize.QueryTypes.SELECT,
+  });
+
+  if (!result) return next(new AppError('Registro no encontrado', 404));
+
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -82,12 +95,12 @@ exports.deleteOne = (Model) =>
     });
   });
 
-exports.createOneWithFiles = (Model, validationTypes, fileColumn) =>
+exports.createOneWithFiles = (Model, validationTypes, fileColumn, folder = '') =>
   catchAsync(async (req, res, next) => {
     // 1) Se construye el modelo
     const newRecord = Model.build(req.body);
 
-    // 2) Se realiza la primer validación
+    // 2) Se realiza la primera validación
     await newRecord.validate();
 
     // 3) Se define la variable que contendrá los archivos
@@ -100,7 +113,8 @@ exports.createOneWithFiles = (Model, validationTypes, fileColumn) =>
           req.files,
           res,
           next,
-          validationTypes
+          validationTypes,
+          folder
         );
 
         // 5) Si los archivo se suben correctamente se agregara el campo
@@ -129,7 +143,7 @@ exports.createOneWithFiles = (Model, validationTypes, fileColumn) =>
     }
   });
 
-exports.updateOneWithFiles = (Model, validationTypes, fileColumn) =>
+exports.updateOneWithFiles = (Model, validationTypes, fileColumn, folder) =>
   catchAsync(async (req, res, next) => {
     // 1) Encontrar el registro a actualizar
     const existingRecord = await Model.findByPk(req.params.id);
@@ -163,7 +177,8 @@ exports.updateOneWithFiles = (Model, validationTypes, fileColumn) =>
         req.files,
         res,
         next,
-        validationTypes
+        validationTypes,
+        folder
       );
 
       req.body[fileColumn] = files;

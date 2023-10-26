@@ -32,7 +32,8 @@ exports.deleteSucursal = factory.deleteOneWithFiles(Sucursal, 'images');
 exports.createSucursal = factory.createOneWithFiles(
   Sucursal,
   ['image/png', 'image/jpg', 'image/jpeg'],
-  'images'
+  'images',
+  'sucursal'
 );
 
 // exports.updateSucursal = catchAsync(async (req, res, next) => {
@@ -80,5 +81,6 @@ exports.createSucursal = factory.createOneWithFiles(
 exports.updateSucursal = factory.updateOneWithFiles(
   Sucursal,
   ['image/png', 'image/jpg', 'image/jpeg'],
-  'images'
+  'images',
+  'sucursal'
 );

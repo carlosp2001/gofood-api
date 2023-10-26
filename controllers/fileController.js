@@ -4,7 +4,7 @@ const path = require('path');
 const AppError = require('../utils/appError');
 const aws = require('../utils/aws');
 
-exports.uploadFiles = async (files, res, next, validationTypes) => {
+exports.uploadFiles = async (files, res, next, validationTypes, folder) => {
   if (files.length === 0 || !files)
     return next(new AppError('No hay archivos para subir'));
 
@@ -17,7 +17,7 @@ exports.uploadFiles = async (files, res, next, validationTypes) => {
     files.map((f, index) =>
       aws
         .uploadFile(
-          `sucursal/${uuidv4()}-${index}${path.extname(f.originalname)}`,
+          `${folder}/${uuidv4()}-${index}${path.extname(f.originalname)}`,
           f.buffer
         )
         .then((data) => ({

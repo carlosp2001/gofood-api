@@ -6,11 +6,9 @@ const addonController = require('../controllers/addonController');
 const router = express.Router();
 
 // Complementos
-router.post(
-  '/',
-  multer.upload.array('files', 1),
-  addonController.createAddon
-);
+router.get('/:id', addonController.getAllAddonsByRestaurant);
+
+router.post('/', multer.upload.array('files', 1), addonController.createAddon);
 
 router.patch(
   '/:id',
@@ -18,20 +16,13 @@ router.patch(
   addonController.updateAddon
 );
 
+router.delete('/:id', addonController.deleteAddon);
+
 // Categoría de complementos
-router.get('/:id/categories', addonController.getAllCategoriesByRestaurant)
-router.get('/categories', addonController.getAllCategories)
-router.post(
-  '/categories',
-  addonController.createAddonCategory
-);
-router.patch(
-  '/categories/:id',
-  addonController.updateAddonCategory
-);
-router.delete(
-  '/categories/:id',
-  addonController.deleteAddonCategory
-);
+router.get('/:id/categories', addonController.getAllCategoriesByRestaurant);
+router.get('/categories', addonController.getAllCategories);
+router.post('/categories', addonController.createAddonCategory);
+router.patch('/categories/:id', addonController.updateAddonCategory);
+router.delete('/categories/:id', addonController.deleteAddonCategory);
 
 module.exports = router;
