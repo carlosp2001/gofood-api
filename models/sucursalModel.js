@@ -120,22 +120,4 @@ Sucursal.beforeValidate(async (sucursal) => {
   if (sucursal.name) sucursal.slug = slugify(sucursal.name, { lower: true });
 });
 
-const addSlug = async (sucursal, isUpdating) => {
-  let slug;
-  if (sucursal.name) slug = slugify(sucursal.name, { lower: true });
-  let queryResult;
-  if (isUpdating) {
-    console.log('Hola');
-    queryResult = await Sucursal.findOne({
-      where: {
-        [Op.and]: [{ slug: slug }, { id: { [Op.not]: sucursal.id } }],
-      },
-    });
-  } else {
-    queryResult = await Sucursal.findOne({ where: { slug } });
-  }
-  if (queryResult) throw new Error('El nombre debe ser único');
-  sucursal.slug = slug;
-};
-
 module.exports = Sucursal;

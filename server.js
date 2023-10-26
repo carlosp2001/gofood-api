@@ -9,6 +9,7 @@ else if (process.env.NODE_ENV === 'local')
 
 const User = require('./models/userModel');
 const Restaurant = require('./models/restaurantModel');
+const Addon = require('./models/addonModel');
 
 // Sincroniza la base de datos
 sequelize

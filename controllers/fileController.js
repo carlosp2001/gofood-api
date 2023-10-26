@@ -34,7 +34,7 @@ exports.deleteFiles = async (files) => {
       aws
         .deleteFile(f.key)
         .then(() => `Eliminado archivo ${f.key}`)
-        .catch(() => `Error eliminando el archivo ${f.key}`)
+        .catch((e) => `Error eliminando el archivo ${f.key} ${e.message}`)
     )
   );
 };

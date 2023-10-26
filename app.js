@@ -9,6 +9,7 @@ const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
 const restaurantRouter = require('./routes/restaurantRoutes');
 const sucursalRouter = require('./routes/sucursalRoutes');
+const addonRouter = require('./routes/addonRoutes');
 
 const app = express();
 require('./utils/passport');
@@ -29,6 +30,7 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/restaurant', restaurantRouter);
 app.use('/api/v1/sucursal', sucursalRouter);
+app.use('/api/v1/addon', addonRouter);
 
 app.get('/', (req, res) => {
   res.status(200).send('hello');

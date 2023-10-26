@@ -1,13 +1,15 @@
 const uuidValidate = require('uuid-validate');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const Sucursal = require('../models/sucursalModel');
 const fileController = require('../controllers/fileController');
 const _ = require('lodash');
+const Sucursal = require('../models/sucursalModel');
 
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
-    const data = await Model.findAll();
+    const data = await Model.findAll({
+      order: [['createdAt', 'DESC']],
+    });
 
     // SEND RESPONSE
     res.status(200).json({
@@ -177,7 +179,7 @@ exports.updateOneWithFiles = (Model, validationTypes, fileColumn) =>
       // 12) De haber algún error se eliminarán del bucket las nuevas imágenes
       // que se subieron, las antiguas imágenes se mantendrán
       console.log(e);
-      console.log(await fileController.deleteFiles(files));
+      if (files) console.log(await fileController.deleteFiles(files));
       return next(new AppError(e.message));
     }
 
@@ -191,5 +193,26 @@ exports.updateOneWithFiles = (Model, validationTypes, fileColumn) =>
       data: {
         data: updatedRecord,
       },
+    });
+  });
+
+exports.deleteOneWithFiles = (Model, fileColumn) =>
+  catchAsync(async (req, res, next) => {
+    const existingRecord = await Model.findByPk(req.params.id);
+
+    if (!existingRecord)
+      return next(new AppError('Ningún Registro encontrado', 404));
+
+    let currentFiles;
+    if (existingRecord.images)
+      currentFiles = _.cloneDeep(existingRecord[fileColumn]);
+
+    await existingRecord.destroy();
+    if (currentFiles)
+      console.log(await fileController.deleteFiles(currentFiles));
+
+    res.status(204).json({
+      status: 'success',
+      data: null,
     });
   });

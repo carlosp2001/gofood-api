@@ -9,23 +9,25 @@ const AppError = require('../utils/appError');
 exports.getAllSucursals = factory.getAll(Sucursal);
 exports.getOneSucursal = factory.getOne(Sucursal);
 
-exports.deleteSucursal = catchAsync(async (req, res, next) => {
-  const existingSucursal = await Sucursal.findByPk(req.params.id);
+exports.deleteSucursal = factory.deleteOneWithFiles(Sucursal, 'images');
 
-  if (!existingSucursal)
-    return next(new AppError('Ningún Registro encontrado', 404));
-
-  const currentImages = _.cloneDeep(existingSucursal.images);
-
-  await existingSucursal.destroy();
-  if (currentImages)
-    console.log(await fileController.deleteFiles(currentImages));
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+// exports.deleteSucursal = catchAsync(async (req, res, next) => {
+//   const existingSucursal = await Sucursal.findByPk(req.params.id);
+//
+//   if (!existingSucursal)
+//     return next(new AppError('Ningún Registro encontrado', 404));
+//
+//   const currentImages = _.cloneDeep(existingSucursal.images);
+//
+//   await existingSucursal.destroy();
+//   if (currentImages)
+//     console.log(await fileController.deleteFiles(currentImages));
+//
+//   res.status(204).json({
+//     status: 'success',
+//     data: null,
+//   });
+// });
 
 exports.createSucursal = factory.createOneWithFiles(
   Sucursal,

@@ -5,15 +5,21 @@ if (process.env.NODE_ENV === 'dev') dotenv.config({ path: './.env' });
 else if (process.env.NODE_ENV === 'local')
   dotenv.config({ path: './.env.local' });
 
-const sequelize = new Sequelize(process.env.DATABASE, {
+const sequelizeOptions = {
   dialect: 'postgres',
-  ssl: true,
-  dialectOptions: {
+};
+
+if (process.env.NODE_ENV === 'dev') {
+  sequelizeOptions.ssl = true;
+  sequelizeOptions.dialectOptions = {
     ssl: {
       require: true,
     },
-  },
-});
+  };
+}
+
+const sequelize = new Sequelize(process.env.DATABASE, sequelizeOptions);
+
 sequelize
   .authenticate()
   .then(() => {
