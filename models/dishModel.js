@@ -26,6 +26,23 @@ const Dish = sequelize.define('Dish', {
       },
     },
   },
+  description: {
+    type: DataTypes.STRING(250),
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'La descripción del platillo es obligatorio',
+      },
+      len: {
+        args: [1, 250],
+        msg: 'La descripción del platillo debe tener entre 1 y 100 caracteres',
+      },
+      notEmpty: {
+        args: true,
+        msg: 'La descripción del platillo es obligatorio',
+      },
+    }
+  },
   images: {
     type: DataTypes.ARRAY(DataTypes.JSON),
     allowNull: true,
