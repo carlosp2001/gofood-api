@@ -45,6 +45,7 @@ exports.getOneWithQuery = catchAsync(async (res, next, query) => {
 
   res.status(200).json({
     status: 'success',
+    results: result.length,
     data: result,
   });
 });
@@ -219,7 +220,7 @@ exports.deleteOneWithFiles = (Model, fileColumn) =>
       return next(new AppError('Ningún Registro encontrado', 404));
 
     let currentFiles;
-    if (existingRecord.images)
+    if (existingRecord[fileColumn])
       currentFiles = _.cloneDeep(existingRecord[fileColumn]);
 
     await existingRecord.destroy();

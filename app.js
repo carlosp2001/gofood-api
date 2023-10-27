@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const passport = require('passport');
 const session = require('express-session');
+const { middleware, visualizer } = require('express-routes-visualizer')
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -10,6 +11,7 @@ const authRouter = require('./routes/authRoutes');
 const restaurantRouter = require('./routes/restaurantRoutes');
 const sucursalRouter = require('./routes/sucursalRoutes');
 const addonRouter = require('./routes/addonRoutes');
+const dishRouter = require('./routes/dishRoutes');
 
 const app = express();
 require('./utils/passport');
@@ -31,6 +33,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/restaurant', restaurantRouter);
 app.use('/api/v1/sucursal', sucursalRouter);
 app.use('/api/v1/addon', addonRouter);
+app.use('/api/v1/dish', dishRouter);
 
 app.get('/', (req, res) => {
   res.status(200).send('hello');

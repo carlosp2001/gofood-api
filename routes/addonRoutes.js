@@ -20,8 +20,8 @@ router.delete('/:id', addonController.deleteAddon);
 
 // Categoría de complementos
 router.get('/:id/categories', addonController.getAllCategoriesByRestaurant);
-router.get('/categories', addonController.getAllCategories);
-router.post('/categories', addonController.createAddonCategory);
+router.get('/categories/all', addonController.getAllCategories);
+router.post('/categories/create', addonController.createAddonCategory);
 router.patch('/categories/:id', addonController.updateAddonCategory);
 router.delete('/categories/:id', addonController.deleteAddonCategory);
 

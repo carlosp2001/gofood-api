@@ -27,6 +27,7 @@
     "crypto": "~1.0.1",
     "dotenv": "~16.3.1",
     "express": "~4.18.2",
+    "express-routes-visualizer": "^0.2.4",
     "express-session": "~1.17.3",
     "jsonwebtoken": "~9.0.2",
     "lodash": "^4.17.21",
@@ -44,6 +45,7 @@
     "sequelize": "~6.33.0",
     "sequelize-cli": "~6.6.1",
     "slugify": "^1.6.6",
+    "uninstall": "^0.0.0",
     "uuid": "^9.0.1",
     "uuid-validate": "^0.0.3",
     "validator": "~13.11.0"
