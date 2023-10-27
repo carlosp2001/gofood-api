@@ -15,4 +15,7 @@ exports.updateRestaurant = factory.updateOneWithFiles(
   'images',
   'restaurant'
 );
-exports.deleteRestaurant = factory.deleteOne(Restaurant);
+exports.deleteRestaurant = factory.deleteOneWithFiles(
+  Restaurant,
+  'images'
+);
