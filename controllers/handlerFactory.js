@@ -96,7 +96,12 @@ exports.deleteOne = (Model) =>
     });
   });
 
-exports.createOneWithFiles = (Model, validationTypes, fileColumn, folder = '') =>
+exports.createOneWithFiles = (
+  Model,
+  validationTypes,
+  fileColumn,
+  folder = ''
+) =>
   catchAsync(async (req, res, next) => {
     // 1) Se construye el modelo
     const newRecord = Model.build(req.body);
@@ -144,7 +149,12 @@ exports.createOneWithFiles = (Model, validationTypes, fileColumn, folder = '') =
     }
   });
 
-exports.updateOneWithFiles = (Model, validationTypes, fileColumn, folder) =>
+exports.updateOneWithFiles = (
+  Model,
+  validationTypes,
+  fileColumn,
+  folder
+) =>
   catchAsync(async (req, res, next) => {
     // 1) Encontrar el registro a actualizar
     const existingRecord = await Model.findByPk(req.params.id);
@@ -206,9 +216,7 @@ exports.updateOneWithFiles = (Model, validationTypes, fileColumn, folder) =>
 
     res.status(200).json({
       status: 'success',
-      data: {
-        data: updatedRecord,
-      },
+      data: updatedRecord,
     });
   });
 
