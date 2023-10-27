@@ -2,8 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const passport = require('passport');
 const session = require('express-session');
-const { middleware, visualizer } = require('express-routes-visualizer')
-
+const cors = require('cors');
 const globalErrorHandler = require('./controllers/errorController');
 
 const userRouter = require('./routes/userRoutes');
@@ -15,6 +14,10 @@ const dishRouter = require('./routes/dishRoutes');
 
 const app = express();
 require('./utils/passport');
+const corsOptions = {
+  origin: '*',
+};
+app.use(cors(corsOptions));
 
 // Configuración de passport para la session
 app.use(session({ secret: process.env.JWT_SECRET }));
@@ -25,6 +28,7 @@ app.use(passport.session());
 if (process.env.NODE_ENV === 'dev') {
   app.use(morgan('dev'));
 }
+
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
